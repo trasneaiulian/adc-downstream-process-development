@@ -1,15 +1,17 @@
 # Data-Driven Development of an ADC Downstream Purification Process
 
-A simulated bioprocess-development case study exploring how process data can
-be used to support downstream purification decisions for an antibody-drug
-conjugate (ADC).
+A computational bioprocess-development case study exploring how simulated
+process data can be used to support downstream purification decisions for an
+antibody-drug conjugate (ADC).
 
 The project combines protein purification and downstream-process concepts with
 Python-based data analysis to investigate trade-offs between product recovery,
-small-molecule impurity clearance, aggregation, and ADC product quality.
+aggregate content, residual free drug-linker, and drug-to-antibody ratio (DAR).
 
-> **Project status:** Work in progress. The project is being developed
-> incrementally alongside ongoing training in Python and data analytics.
+> **Project status:** Work in progress. This project is being developed
+> incrementally as part of ongoing training in Python and data analytics.
+
+---
 
 ## Project objective
 
@@ -17,62 +19,76 @@ Following antibody-drug conjugation, downstream processing must remove
 process-related impurities and undesirable product variants while maintaining
 product recovery and critical quality attributes.
 
-This project models a hypothetical post-conjugation ADC purification campaign
-and addresses the question:
+This project models a hypothetical post-conjugation ADC purification
+development campaign and asks:
 
 > **Which downstream process conditions provide the best balance between ADC
 > recovery and product quality?**
 
-All process-response data used in this repository are **simulated**. They are
-designed to represent plausible process-development scenarios and do not
-represent experimental measurements from a specific ADC, resin, membrane, or
-manufacturing process.
+The project currently evaluates two sequential downstream operations:
 
-## Hypothetical molecule
+**Post-conjugation material → UF/DF → multimodal chromatography → purified ADC**
 
-The case study considers a hypothetical:
+All process-response data used in this project are simulated and clearly
+identified as such. They do not represent experimental measurements generated
+in the laboratory.
 
-- IgG1 antibody-drug conjugate;
-- cysteine-based conjugation strategy;
-- hydrophobic small-molecule payload;
-- target mean drug-to-antibody ratio (DAR) of approximately 4.
+---
+
+## Hypothetical ADC
+
+The case study considers a hypothetical ADC with the following characteristics:
+
+- molecule type: IgG1 antibody-drug conjugate;
+- conjugation approach: cysteine-based conjugation;
+- payload: generic hydrophobic small-molecule payload;
+- target mean DAR: approximately 4;
+- development stage: post-conjugation downstream purification.
 
 The post-conjugation material is assumed to contain the desired ADC together
-with free drug-linker, aggregates, residual small molecules, and ADC product
-variants.
+with process-related impurities and product variants, including:
 
-## Downstream process
+- residual free drug-linker;
+- low-molecular-weight reaction components;
+- aggregates;
+- unconjugated or under-conjugated antibody;
+- higher-DAR product species.
 
-The modeled downstream process consists of two unit operations:
+---
 
-```text
-Post-conjugation material
-        |
-        v
-      UF/DF
-        |
-        v
-Multimodal chromatography
-        |
-        v
-   Purified ADC
-```
+## Downstream process strategy
+
+The simulated purification process consists of two main unit operations:
 
 ### 1. Ultrafiltration/diafiltration (UF/DF)
 
-UF/DF is modeled as the initial cleanup and buffer-exchange operation.
+UF/DF is used as the initial post-conjugation cleanup operation.
 
-The main development objective is to reduce residual free drug-linker while
-maintaining ADC recovery.
+Its primary objectives are to:
 
-Diafiltration volumes from 0 to 6 DV were evaluated using a simplified
-exponential small-molecule clearance model.
+- remove residual free drug-linker and other low-molecular-weight components;
+- perform buffer exchange;
+- retain the substantially larger ADC product.
 
 ### 2. Multimodal chromatography (MMC)
 
-Multimodal chromatography is modeled as the polishing operation.
+Multimodal chromatography is used as a polishing operation following UF/DF.
 
-A full-factorial screening design evaluates three process parameters:
+Its primary objectives are to:
+
+- improve product quality;
+- reduce aggregates and undesirable product variants;
+- maintain acceptable ADC recovery.
+
+The project evaluates the two unit operations separately before combining
+their recoveries to estimate overall downstream process performance.
+
+---
+
+## Multimodal chromatography screening
+
+A full-factorial screening design was constructed to investigate three
+chromatography process parameters.
 
 | Parameter | Screening levels |
 |---|---|
@@ -80,182 +96,305 @@ A full-factorial screening design evaluates three process parameters:
 | NaCl concentration | 50, 150, 300 mM |
 | Load density | 10, 25 mg ADC/mL resin |
 
-This produces **18 simulated process conditions**.
+The design contains:
 
-The main responses evaluated are:
+**3 × 3 × 2 = 18 simulated process conditions**
+
+For each condition, four responses were evaluated:
 
 - ADC recovery (%);
 - aggregate content (%);
 - residual free drug-linker (ppm);
 - mean DAR.
 
-## Multimodal chromatography results
+The simulated response relationships were defined before exploratory analysis
+and include a fixed random seed to ensure reproducibility.
 
-Exploratory analysis showed a trade-off between ADC recovery and aggregate
-clearance.
+---
 
-The highest individual recovery was observed at:
+## MMC exploratory analysis
 
-- pH 6.5;
-- 150 mM NaCl;
-- 10 mg ADC/mL resin;
-- ADC recovery: 93.99%;
-- aggregate content: 2.53%.
+Initial analysis showed that ADC recovery was highest under moderate pH and
+salt conditions and at the lower load density.
 
-However, maximizing recovery alone did not provide the strongest overall
-process outcome.
+Mean recovery was highest at:
 
-Using hypothetical screening criteria of:
+- **pH 6.5:** 91.48%;
+- **150 mM NaCl:** 90.71%;
+- **10 mg ADC/mL resin:** 90.84%.
 
-- ADC recovery >= 90%;
-- aggregate content <= 2.5%;
+Aggregate behavior showed a different trend.
 
-two candidate conditions were identified.
+Mean aggregate content decreased from:
 
-The preferred preliminary MMC condition was:
+- 3.02% at pH 5.5 to 2.35% at pH 7.5;
+- 3.16% at 50 mM NaCl to 2.20% at 300 mM NaCl.
 
-| Parameter / response | Selected value |
+Increasing load density from 10 to 25 mg ADC/mL resin increased mean aggregate
+content from 2.46% to 2.90%.
+
+These results illustrate a simulated process-development trade-off: conditions
+that maximize product recovery do not necessarily provide the strongest
+aggregate clearance.
+
+---
+
+## Preliminary MMC process selection
+
+To identify balanced process conditions, hypothetical project screening
+criteria were applied:
+
+- ADC recovery ≥ 90%;
+- aggregate content ≤ 2.5%.
+
+Two of the 18 screening conditions met both criteria.
+
+The preliminary selected MMC condition was:
+
+- **pH:** 6.5
+- **NaCl concentration:** 300 mM
+- **load density:** 10 mg ADC/mL resin
+
+The simulated responses for this condition were:
+
+| Response | Result |
 |---|---:|
-| pH | 6.5 |
-| NaCl | 300 mM |
-| Load density | 10 mg ADC/mL resin |
 | ADC recovery | 92.45% |
 | Aggregate content | 1.91% |
 | Residual free drug-linker | 16.65 ppm |
 | Mean DAR | 3.95 |
 
-This condition sacrificed a small amount of recovery relative to the
-maximum-recovery condition while providing improved aggregate clearance.
+This condition was selected because it provided a strong balance between
+recovery and the evaluated product-quality responses within the simulated
+screening space.
 
-![ADC process-selection window](results/figures/adc_process_selection_window.png)
+It should be considered a **preferred condition within this case study**, not
+an experimentally demonstrated process optimum.
 
-## UF/DF results
+---
 
-The UF/DF simulation started with a hypothetical residual free drug-linker
-concentration of 1000 ppm.
+## UF/DF development
 
-Increasing diafiltration volume resulted in rapid small-molecule clearance
-while ADC recovery decreased gradually.
+The UF/DF study evaluated increasing diafiltration volumes from:
 
-Two hypothetical development criteria were applied:
+**0 to 6 DV**
 
-- residual free drug-linker <= 20 ppm;
-- ADC recovery >= 96%.
+Two primary responses were simulated:
 
-Both 4 DV and 5 DV satisfied these criteria.
+- residual free drug-linker concentration;
+- ADC recovery.
 
-A **5-DV endpoint** was selected because it reduced residual free drug-linker
-to 6.30 ppm while maintaining 96.02% ADC recovery.
+Free drug-linker clearance was represented using a simplified exponential
+clearance relationship, while ADC recovery was modelled as gradually declining
+with increasing processing intensity.
 
-![UF/DF impurity clearance and recovery](results/figures/adc_ufdf_clearance_recovery.png)
+The simulated results demonstrated rapid initial impurity clearance followed
+by diminishing returns at higher diafiltration volumes.
 
-## Integrated process recovery
+| DV | Free drug-linker (ppm) | Linker removal | ADC recovery |
+|---:|---:|---:|---:|
+| 0 | 1000.00 | 0.00% | 99.06% |
+| 1 | 367.88 | 63.21% | 97.99% |
+| 2 | 135.34 | 86.47% | 97.55% |
+| 3 | 49.79 | 95.02% | 96.79% |
+| 4 | 18.32 | 98.17% | 95.41% |
+| 5 | 6.74 | 99.33% | 94.74% |
+| 6 | 2.48 | 99.75% | 94.23% |
 
-The selected unit-operation recoveries were:
+---
 
-| Process stage | Step recovery |
-|---|---:|
-| UF/DF (5 DV) | 96.02% |
-| Multimodal chromatography | 92.45% |
+## Preliminary UF/DF process selection
 
-The estimated cumulative downstream recovery is:
+The region between 4 and 5 DV provided an attractive balance between
+small-molecule clearance and ADC recovery.
 
-**88.77%**
+At **5 DV**:
 
-This illustrates how relatively small product losses at individual unit
-operations accumulate across a downstream process.
+- free drug-linker removal reached **99.33%**;
+- residual free drug-linker decreased to **6.74 ppm**;
+- ADC recovery remained at **94.74%**.
 
-## Key process-development observations
+Increasing from 5 to 6 DV provided comparatively little additional impurity
+clearance while recovery continued to decrease.
 
-The simulated case study illustrates several general process-development
-principles:
+Therefore, **5 DV** was selected as the preliminary UF/DF operating condition
+for this simulated process.
 
-- maximizing recovery alone does not necessarily identify the preferred
-  purification condition;
-- impurity clearance and product recovery can represent competing objectives;
-- process conditions can be screened systematically rather than selected from
-  a single response;
-- explicit decision criteria can help identify promising operating conditions;
-- cumulative recovery should be considered across the complete downstream
-  process.
+---
 
-Because the dataset is simulated, these observations demonstrate the analytical
-workflow rather than establishing experimental conclusions about a particular
-ADC purification process.
+## Overall downstream process performance
 
-## Repository structure
+The selected UF/DF condition was combined with the preferred multimodal
+chromatography condition:
+
+**Post-conjugation material → 5 DV UF/DF → MMC → purified ADC**
+
+Because the unit operations occur sequentially, overall product recovery is
+calculated multiplicatively rather than by averaging the individual recovery
+values.
+
+| Process step | Selected condition | Recovery |
+|---|---|---:|
+| UF/DF | 5 DV | 94.74% |
+| Multimodal chromatography | pH 6.5, 300 mM NaCl, 10 mg/mL resin | 92.45% |
+| Overall downstream process | UF/DF + MMC | **87.59%** |
+
+Starting conceptually with 100 units of ADC-equivalent material, approximately
+94.74 units would remain after UF/DF and approximately 87.59 units after the
+subsequent chromatography operation.
+
+This illustrates why optimization of individual purification operations must
+also consider their cumulative effect on overall process yield.
+
+---
+
+## Data visualization
+
+The project generates figures to support process interpretation and condition
+selection.
+
+Current visualizations include:
+
+- recovery main effects across the MMC screening parameters;
+- recovery versus aggregate trade-off and process-selection window;
+- UF/DF free drug-linker clearance and ADC recovery across diafiltration
+  volumes.
+
+Figures are exported as static PNG files so that key results remain accessible
+directly from the repository.
+
+---
+
+## Project structure
 
 ```text
 adc-downstream-process-development/
-|
-|-- data/
-|   |-- raw/
-|   `-- processed/
-|       |-- adc_mmc_screening_design.csv
-|       |-- adc_mmc_simulated_results.csv
-|       `-- adc_ufdf_simulated_results.csv
-|
-|-- notebooks/
-|   |-- 01_process_design.ipynb
-|   `-- 02_ufdf_development.ipynb
-|
-|-- results/
-|   `-- figures/
-|       |-- adc_process_selection_window.png
-|       |-- adc_recovery_main_effects.png
-|       `-- adc_ufdf_clearance_recovery.png
-|
-|-- README.md
-|-- requirements.txt
-`-- .gitignore
+├── data/
+│   ├── raw/
+│   └── processed/
+│       ├── adc_mmc_screening_design.csv
+│       ├── adc_mmc_simulated_results.csv
+│       └── adc_ufdf_simulated_results.csv
+├── notebooks/
+│   ├── 01_process_design.ipynb
+│   └── 02_ufdf_development.ipynb
+├── results/
+│   └── figures/
+│       ├── adc_process_selection_window.png
+│       ├── adc_recovery_main_effects.png
+│       └── ufdf_clearance_recovery.png
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```
 
-## Tools
+---
 
-The current analysis uses:
+## Tools and methods
+
+The current project uses:
 
 - Python
-- NumPy
+- Jupyter Notebook
 - Pandas
+- NumPy
 - Matplotlib
-- Jupyter
+- full-factorial experimental-design concepts
+- exploratory data analysis
+- rule-based process-condition screening
+- data visualization
+- sequential process-recovery calculations
+
+The analysis is intentionally being developed incrementally. More advanced
+statistical modelling and process optimization may be incorporated as the
+project develops.
+
+---
 
 ## Reproducibility
 
-Random-number generators use fixed seeds so that the simulated datasets can be
-reproduced when the notebooks are rerun.
+Processed datasets generated during the analysis are stored in
+`data/processed/`.
 
-The analysis is organized into separate notebooks for multimodal
-chromatography screening and UF/DF process development.
+Figures are exported to `results/figures/`.
+
+The UF/DF analysis reads the MMC results generated by the preceding analysis
+rather than manually reproducing the selected chromatography recovery value.
+This helps maintain consistency between the two stages of the project.
+
+Random variation in the simulated datasets uses fixed random seeds so that the
+results can be reproduced when the notebooks are rerun.
+
+---
+
+## Scientific basis
+
+The project design is informed by published literature describing
+post-conjugation ADC purification and process development.
+
+In particular, published work has demonstrated the application of multimodal
+chromatography to post-conjugation ADC purification using high-throughput
+screening followed by column verification and in-silico process development.
+
+ADC downstream-processing literature also identifies attributes such as DAR,
+free drug-linker, aggregates, and product variants as important considerations
+during process development.
+
+The numerical datasets in this repository were **not extracted from these
+publications**. The literature provides scientific context for the hypothetical
+process-development scenario, while the numerical response data are simulated.
+
+### References
+
+1. Matsuda Y. *Current approaches for the purification of antibody-drug
+   conjugates.* Journal of Separation Science. 2022.
+   DOI: 10.1002/jssc.202100575.
+
+2. Keller WR, Wendeler M. *Using multimodal chromatography for
+   post-conjugation antibody-drug conjugate purification: A methodology from
+   high throughput screening to in-silico process development.*
+   Journal of Chromatography A. 2021;1653:462378.
+   DOI: 10.1016/j.chroma.2021.462378.
+
+---
 
 ## Limitations
 
-This project is a computational case study and does not contain laboratory
-measurements.
+This project is a **simulated bioprocess-development case study**.
 
-The process-response relationships, numerical screening ranges, and acceptance
-criteria are hypothetical. They are intended to create a realistic
-data-analysis exercise and should not be interpreted as universal ADC process
-parameters, regulatory specifications, or experimentally validated operating
-conditions.
+The process-response data do not represent laboratory measurements from a
+specific ADC, chromatography resin, membrane, or manufacturing process.
 
-The current analysis focuses primarily on exploratory data analysis and simple
-rule-based process selection. More advanced statistical modelling and process
-optimization may be added as the project develops.
+The parameter ranges, response relationships, and screening thresholds are
+project assumptions designed to create a realistic data-analysis scenario.
+They should not be interpreted as universal ADC manufacturing specifications.
 
-## Scientific context
+Because the responses are generated from predefined simulation relationships,
+the exploratory analysis demonstrates whether the imposed relationships can be
+identified and interpreted; it does not provide experimental evidence that
+these relationships apply to real ADC purification processes.
 
-Post-conjugation purification of ADCs requires control of product-related
-variants and process-related impurities while maintaining product recovery.
+Experimental verification would be required before applying any conclusions
+to an actual downstream process.
 
-Multimodal chromatography has been investigated for post-conjugation ADC
-purification and can provide selectivity through combinations of interaction
-mechanisms. UF/DF can support buffer exchange and clearance of low-molecular-
-weight process impurities.
+---
 
-The project design was informed by published literature on ADC downstream
-processing and post-conjugation purification, while all numerical datasets in
-this repository were independently simulated for this case study.
+## Future development
+
+Future versions of the project may include:
+
+- modular Python scripts for data generation and processing;
+- additional process-development variables;
+- formal design-of-experiments analysis;
+- statistical modelling of process responses;
+- multi-objective optimization;
+- sensitivity analysis;
+- additional product-quality attributes;
+- integration of experimentally published or openly available datasets where
+  appropriate.
+
+The project will be expanded progressively as additional data-analysis methods
+are learned.
 
 ## References
 
