@@ -100,15 +100,15 @@ The design contains:
 
 **3 × 3 × 2 = 18 simulated process conditions**
 
-For each condition, four responses were evaluated:
+For each condition, three responses were evaluated:
 
 - ADC recovery (%);
 - aggregate content (%);
-- residual free drug-linker (ppm);
 - mean DAR.
 
-The simulated response relationships were defined before exploratory analysis
-and include a fixed random seed to ensure reproducibility.
+Residual free drug-linker is addressed separately during UF/DF development,
+which represents the primary small-molecule clearance operation in the
+simulated downstream process.
 
 ---
 
@@ -161,12 +161,19 @@ The simulated responses for this condition were:
 |---|---:|
 | ADC recovery | 92.45% |
 | Aggregate content | 1.91% |
-| Residual free drug-linker | 16.65 ppm |
-| Mean DAR | 3.95 |
+| Mean DAR | 3.96 |
 
-This condition was selected because it provided a strong balance between
-recovery and the evaluated product-quality responses within the simulated
-screening space.
+This condition was selected because it provided the higher recovery and lower
+aggregate content of the two conditions that met the hypothetical screening
+criteria. Mean DAR remained close to the target value of approximately 4.
+
+The alternative candidate, pH 7.5 with 150 mM NaCl and a load density of
+10 mg ADC/mL resin, produced a mean DAR of 3.98 but showed slightly lower
+recovery and higher aggregate content.
+
+The selected condition should be considered a **preferred condition within
+this simulated screening study**, not an experimentally demonstrated process
+optimum.
 
 It should be considered a **preferred condition within this case study**, not
 an experimentally demonstrated process optimum.
